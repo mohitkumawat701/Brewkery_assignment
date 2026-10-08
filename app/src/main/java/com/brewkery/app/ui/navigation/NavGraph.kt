@@ -7,25 +7,21 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.brewkery.app.ui.cart.CartScreen
-import com.brewkery.app.ui.cart.CartViewModel
-import com.brewkery.app.ui.detail.ItemDetailScreen
-import com.brewkery.app.ui.menu.MenuScreen
-import com.brewkery.app.ui.menu.MenuViewModel
-import com.brewkery.app.ui.order.OrderStatusScreen
-
-// ── Route definitions ─────────────────────────────────────────────────────────
+import com.brewkery.app.ui.features.cart.CartScreen
+import com.brewkery.app.ui.features.cart.CartViewModel
+import com.brewkery.app.ui.features.detail.ItemDetailScreen
+import com.brewkery.app.ui.features.menu.MenuScreen
+import com.brewkery.app.ui.features.menu.MenuViewModel
+import com.brewkery.app.ui.features.order.OrderStatusScreen
 
 object NavRoutes {
-    const val MENU   = "menu"
+    const val MENU = "menu"
     const val DETAIL = "detail/{itemId}"
-    const val CART   = "cart"
-    const val ORDER  = "order"
+    const val CART = "cart"
+    const val ORDER = "order"
 
     fun detail(itemId: Int) = "detail/$itemId"
 }
-
-// ── Nav host ─────────────────────────────────────────────────────────────────
 
 @Composable
 fun BrewkeryNavGraph(
@@ -35,47 +31,42 @@ fun BrewkeryNavGraph(
     modifier: Modifier = Modifier,
 ) {
     NavHost(
-        navController    = navController,
+        navController = navController,
         startDestination = NavRoutes.MENU,
-        modifier         = modifier,
+        modifier = modifier,
     ) {
-
-        // ── Menu ─────────────────────────────────────────────────────────────
         composable(NavRoutes.MENU) {
             MenuScreen(
                 menuViewModel = menuViewModel,
                 cartViewModel = cartViewModel,
-                onItemClick   = { itemId ->
+                onItemClick = { itemId ->
                     navController.navigate(NavRoutes.detail(itemId))
                 },
-                onCartClick   = { navController.navigate(NavRoutes.CART) },
-                onOrderClick  = { navController.navigate(NavRoutes.ORDER) },
+                onCartClick = { navController.navigate(NavRoutes.CART) },
+                onOrderClick = { navController.navigate(NavRoutes.ORDER) },
             )
         }
 
-        // ── Item Detail ───────────────────────────────────────────────────────
         composable(
-            route     = NavRoutes.DETAIL,
+            route = NavRoutes.DETAIL,
             arguments = listOf(navArgument("itemId") { type = NavType.IntType }),
         ) { backStackEntry ->
             val itemId = backStackEntry.arguments?.getInt("itemId") ?: return@composable
             ItemDetailScreen(
-                itemId        = itemId,
+                itemId = itemId,
                 menuViewModel = menuViewModel,
                 cartViewModel = cartViewModel,
-                onBack        = { navController.popBackStack() },
+                onBack = { navController.popBackStack() },
+                onNavigateToCart = { navController.navigate(NavRoutes.CART) },
             )
         }
 
-        // ── Cart ──────────────────────────────────────────────────────────────
         composable(NavRoutes.CART) {
             CartScreen(
                 menuViewModel = menuViewModel,
                 cartViewModel = cartViewModel,
-                onBack        = { navController.popBackStack() },
+                onBack = { navController.popBackStack() },
                 onOrderPlaced = {
-                    // Pop CART off the back stack so pressing Back from ORDER
-                    // returns to MENU — not to an empty cart.
                     navController.navigate(NavRoutes.ORDER) {
                         popUpTo(NavRoutes.CART) { inclusive = true }
                     }
@@ -83,13 +74,10 @@ fun BrewkeryNavGraph(
             )
         }
 
-        // ── Order Status ──────────────────────────────────────────────────────
         composable(NavRoutes.ORDER) {
             OrderStatusScreen(
                 cartViewModel = cartViewModel,
-                onBackToMenu  = {
-                    // Pop back to MENU. After Cart→Order navigation, the back stack
-                    // is: MENU → ORDER (CART was already popped). popBackStack() is enough.
+                onBackToMenu = {
                     navController.popBackStack()
                 },
             )

@@ -1,5 +1,6 @@
-package com.brewkery.app
+package com.brewkery.app.di
 
+import com.brewkery.app.BuildConfig
 import com.brewkery.app.data.remote.BrewkeryApi
 import com.brewkery.app.data.repository.CartRepository
 import com.brewkery.app.data.repository.MenuRepository
@@ -9,17 +10,14 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-/**
- * Manual dependency wiring — no DI framework.
- * Created once in BrewkeryApp and accessed via the Application context.
- */
 class AppContainer {
+
+    private val baseUrl = "https://raw.githubusercontent.com/VivekShah138/Brewkery/main/"
 
     private val gson = GsonBuilder().serializeNulls().create()
 
     private val okHttpClient: OkHttpClient by lazy {
         OkHttpClient.Builder().apply {
-            // Logging interceptor enabled only in debug builds to avoid leaking request bodies
             if (BuildConfig.DEBUG) {
                 addInterceptor(
                     HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
@@ -30,7 +28,7 @@ class AppContainer {
 
     private val retrofit: Retrofit by lazy {
         Retrofit.Builder()
-            .baseUrl("https://raw.githubusercontent.com/VivekShah138/Brewkery/main/")
+            .baseUrl(baseUrl)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
@@ -40,6 +38,5 @@ class AppContainer {
 
     val menuRepository: MenuRepository by lazy { MenuRepository(api) }
 
-    /** Singleton cart + order state shared across all screens. */
     val cartRepository: CartRepository by lazy { CartRepository() }
 }
