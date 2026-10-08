@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.brewkery.app"
+    namespace = "com.clickretina.brewkery"
     compileSdk = 35
 
     defaultConfig {
-        applicationId  = "com.brewkery.app"
+        applicationId  = "com.clickretina.brewkery"
         minSdk         = 24
         targetSdk      = 35
         versionCode    = 1

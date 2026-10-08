@@ -113,11 +113,18 @@ Unit tests in `PriceAndCartTests.kt` cover:
 
 ## 🚀 Build & Run
 
-```bash
-# Clone the repository
-git clone <your-github-repo-url>
-cd CLICKRETINA
+Clone the repository:
 
+```bash
+git clone https://github.com/mohitkumawat701/Brewkery_assignment.git
+cd Brewkery_assignment
+```
+
+Open the project in Android Studio and let Gradle sync.
+
+Build/run the app using the normal Android Studio Run configuration or via Gradle:
+
+```bash
 # Run unit tests
 ./gradlew test
 
