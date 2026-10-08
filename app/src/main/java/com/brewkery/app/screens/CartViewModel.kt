@@ -1,15 +1,15 @@
-package com.brewkery.app.ui.features.cart
+package com.brewkery.app.screens
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.brewkery.app.data.repository.CartRepository
-import com.brewkery.app.di.AppContainer
-import com.brewkery.app.domain.model.CartLine
-import com.brewkery.app.domain.model.CartLineKey
-import com.brewkery.app.domain.model.Order
-import com.brewkery.app.domain.model.StoreMeta
-import com.brewkery.app.domain.pricing.PriceCalculator
+import com.brewkery.app.AppContainer
+import com.brewkery.app.model.CartLine
+import com.brewkery.app.model.CartLineKey
+import com.brewkery.app.model.Order
+import com.brewkery.app.model.PriceCalculator
+import com.brewkery.app.model.StoreMeta
+import com.brewkery.app.storage.CartRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map

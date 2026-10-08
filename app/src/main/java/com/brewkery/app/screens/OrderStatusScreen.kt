@@ -1,4 +1,4 @@
-package com.brewkery.app.ui.features.order
+package com.brewkery.app.screens
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -37,14 +37,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.brewkery.app.domain.model.Order
-import com.brewkery.app.domain.model.OrderStatus
-import com.brewkery.app.ui.features.cart.CartViewModel
-import com.brewkery.app.ui.theme.Border
-import com.brewkery.app.ui.theme.BrewkeryTheme
-import com.brewkery.app.ui.theme.Espresso
-import com.brewkery.app.ui.theme.MutedBrown
-import com.brewkery.app.ui.theme.Terracotta
+import com.brewkery.app.model.Order
+import com.brewkery.app.model.OrderStatus
+import com.brewkery.app.theme.Border
+import com.brewkery.app.theme.BrewkeryTheme
+import com.brewkery.app.theme.Espresso
+import com.brewkery.app.theme.MutedBrown
+import com.brewkery.app.theme.Terracotta
 
 @Composable
 fun OrderStatusScreen(

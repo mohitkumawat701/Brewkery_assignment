@@ -1,7 +1,5 @@
-package com.brewkery.app.domain.pricing
+package com.brewkery.app.model
 
-import com.brewkery.app.domain.model.CartLine
-import com.brewkery.app.domain.model.lineTotalCents
 import java.math.BigDecimal
 import java.math.RoundingMode
 

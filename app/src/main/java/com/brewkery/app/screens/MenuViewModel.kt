@@ -1,14 +1,14 @@
-package com.brewkery.app.ui.features.menu
+package com.brewkery.app.screens
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.brewkery.app.data.repository.MenuRepository
-import com.brewkery.app.data.repository.NetworkResult
-import com.brewkery.app.di.AppContainer
-import com.brewkery.app.domain.model.Category
-import com.brewkery.app.domain.model.MenuItem
-import com.brewkery.app.domain.model.StoreMeta
+import com.brewkery.app.AppContainer
+import com.brewkery.app.model.Category
+import com.brewkery.app.model.MenuItem
+import com.brewkery.app.model.StoreMeta
+import com.brewkery.app.network.MenuRepository
+import com.brewkery.app.network.NetworkResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

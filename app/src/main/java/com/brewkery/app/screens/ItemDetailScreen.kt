@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 
-package com.brewkery.app.ui.features.detail
+package com.brewkery.app.screens
 
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
@@ -57,25 +57,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.brewkery.app.R
-import com.brewkery.app.domain.model.CartLine
-import com.brewkery.app.domain.model.CartLineKey
-import com.brewkery.app.domain.model.ItemCustomizations
-import com.brewkery.app.domain.model.MenuItem
-import com.brewkery.app.domain.model.MilkOption
-import com.brewkery.app.domain.model.SizeOption
-import com.brewkery.app.domain.model.StoreMeta
-import com.brewkery.app.domain.pricing.PriceCalculator
-import com.brewkery.app.ui.components.AppImage
-import com.brewkery.app.ui.features.cart.CartViewModel
-import com.brewkery.app.ui.features.menu.MenuUiState
-import com.brewkery.app.ui.features.menu.MenuViewModel
-import com.brewkery.app.ui.theme.Amber
-import com.brewkery.app.ui.theme.Border
-import com.brewkery.app.ui.theme.BrewkeryTheme
-import com.brewkery.app.ui.theme.DarkText
-import com.brewkery.app.ui.theme.Espresso
-import com.brewkery.app.ui.theme.MutedBrown
-import com.brewkery.app.ui.theme.Terracotta
+import com.brewkery.app.components.AppImage
+import com.brewkery.app.model.CartLine
+import com.brewkery.app.model.CartLineKey
+import com.brewkery.app.model.ItemCustomizations
+import com.brewkery.app.model.MenuItem
+import com.brewkery.app.model.MilkOption
+import com.brewkery.app.model.PriceCalculator
+import com.brewkery.app.model.SizeOption
+import com.brewkery.app.model.StoreMeta
+import com.brewkery.app.theme.Amber
+import com.brewkery.app.theme.Border
+import com.brewkery.app.theme.BrewkeryTheme
+import com.brewkery.app.theme.DarkText
+import com.brewkery.app.theme.Espresso
+import com.brewkery.app.theme.MutedBrown
+import com.brewkery.app.theme.Terracotta
 
 @Composable
 fun ItemDetailScreen(

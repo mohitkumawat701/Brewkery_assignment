@@ -1,7 +1,5 @@
-package com.brewkery.app.data.remote
+package com.brewkery.app.network
 
-import com.brewkery.app.data.remote.dto.MenuItemDto
-import com.brewkery.app.data.remote.dto.MenuResponse
 import retrofit2.http.GET
 import retrofit2.http.Path
 

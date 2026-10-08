@@ -1,18 +1,12 @@
-package com.brewkery.app.data.mapper
+package com.brewkery.app.network
 
-import com.brewkery.app.data.remote.dto.CategoryDto
-import com.brewkery.app.data.remote.dto.CustomizationsDto
-import com.brewkery.app.data.remote.dto.MenuItemDto
-import com.brewkery.app.data.remote.dto.MetaDto
-import com.brewkery.app.data.remote.dto.MilkOptionDto
-import com.brewkery.app.data.remote.dto.SizeOptionDto
-import com.brewkery.app.domain.model.Category
-import com.brewkery.app.domain.model.ItemCustomizations
-import com.brewkery.app.domain.model.MenuItem
-import com.brewkery.app.domain.model.MilkOption
-import com.brewkery.app.domain.model.SizeOption
-import com.brewkery.app.domain.model.StoreMeta
-import com.brewkery.app.domain.pricing.PriceCalculator
+import com.brewkery.app.model.Category
+import com.brewkery.app.model.ItemCustomizations
+import com.brewkery.app.model.MenuItem
+import com.brewkery.app.model.MilkOption
+import com.brewkery.app.model.PriceCalculator
+import com.brewkery.app.model.SizeOption
+import com.brewkery.app.model.StoreMeta
 
 fun MetaDto.toDomain(): StoreMeta = StoreMeta(
     appName = app ?: "Brewkery",

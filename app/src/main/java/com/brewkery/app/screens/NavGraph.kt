@@ -1,4 +1,4 @@
-package com.brewkery.app.ui.navigation
+package com.brewkery.app.screens
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -7,12 +7,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.brewkery.app.ui.features.cart.CartScreen
-import com.brewkery.app.ui.features.cart.CartViewModel
-import com.brewkery.app.ui.features.detail.ItemDetailScreen
-import com.brewkery.app.ui.features.menu.MenuScreen
-import com.brewkery.app.ui.features.menu.MenuViewModel
-import com.brewkery.app.ui.features.order.OrderStatusScreen
 
 object NavRoutes {
     const val MENU = "menu"

@@ -1,4 +1,4 @@
-package com.brewkery.app.ui.theme
+package com.brewkery.app.theme
 
 import android.app.Activity
 import androidx.compose.material3.MaterialTheme
@@ -27,33 +27,30 @@ val DarkText        = Color(0xFF231710)   // primary on-light text (slightly ric
 val ErrorRed        = Color(0xFFB00020)
 
 private val BrewkeryColorScheme = lightColorScheme(
-    // Primary = Terracotta (#D9532F) — used for buttons, badges, active chips
     primary              = Terracotta,
     onPrimary            = Color.White,
-    primaryContainer     = BannerFrom,         // banner / soft-terracotta tint
+    primaryContainer     = BannerFrom,
     onPrimaryContainer   = Espresso,
 
-    // Secondary = Espresso (#140B07) — used for selected chips, cart bar background
     secondary            = Espresso,
     onSecondary          = Color.White,
-    secondaryContainer   = Color(0xFFFFEDD5),  // soft amber tint for tags
+    secondaryContainer   = Color(0xFFFFEDD5),
     onSecondaryContainer = Espresso,
 
-    // Tertiary = Amber (#F59E0B) — used for accent text and highlights
     tertiary             = Amber,
     onTertiary           = Espresso,
     tertiaryContainer    = Color(0xFFFFF3CD),
     onTertiaryContainer  = Espresso,
 
-    background           = Crema,             // #FDFAF7
-    onBackground         = DarkText,          // #231710
+    background           = Crema,
+    onBackground         = DarkText,
 
     surface              = Color.White,
     onSurface            = DarkText,
-    surfaceVariant       = BannerTo,          // slightly warmer off-white
-    onSurfaceVariant     = MutedBrown,        // #786457
+    surfaceVariant       = BannerTo,
+    onSurfaceVariant     = MutedBrown,
 
-    outline              = Border,            // #EBD8CB
+    outline              = Border,
     error                = ErrorRed,
 )
 

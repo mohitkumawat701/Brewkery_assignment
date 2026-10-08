@@ -1,9 +1,8 @@
-package com.brewkery.app.di
+package com.brewkery.app
 
-import com.brewkery.app.BuildConfig
-import com.brewkery.app.data.remote.BrewkeryApi
-import com.brewkery.app.data.repository.CartRepository
-import com.brewkery.app.data.repository.MenuRepository
+import com.brewkery.app.network.BrewkeryApi
+import com.brewkery.app.network.MenuRepository
+import com.brewkery.app.storage.CartRepository
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor

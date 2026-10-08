@@ -1,14 +1,14 @@
 package com.brewkery.app
 
-import com.brewkery.app.domain.model.CartLine
-import com.brewkery.app.domain.model.CartLineKey
-import com.brewkery.app.domain.model.ItemCustomizations
-import com.brewkery.app.domain.model.MenuItem
-import com.brewkery.app.domain.model.MilkOption
-import com.brewkery.app.domain.model.SizeOption
-import com.brewkery.app.domain.model.lineTotalCents
-import com.brewkery.app.domain.pricing.PriceCalculator
-import com.brewkery.app.util.TicketIdGenerator
+import com.brewkery.app.model.CartLine
+import com.brewkery.app.model.CartLineKey
+import com.brewkery.app.model.ItemCustomizations
+import com.brewkery.app.model.MenuItem
+import com.brewkery.app.model.MilkOption
+import com.brewkery.app.model.PriceCalculator
+import com.brewkery.app.model.SizeOption
+import com.brewkery.app.model.TicketIdGenerator
+import com.brewkery.app.model.lineTotalCents
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull

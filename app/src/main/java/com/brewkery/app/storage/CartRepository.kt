@@ -1,11 +1,11 @@
-package com.brewkery.app.data.repository
+package com.brewkery.app.storage
 
-import com.brewkery.app.domain.model.CartLine
-import com.brewkery.app.domain.model.CartLineKey
-import com.brewkery.app.domain.model.Order
-import com.brewkery.app.domain.model.OrderStatus
-import com.brewkery.app.domain.model.StoreMeta
-import com.brewkery.app.util.TicketIdGenerator
+import com.brewkery.app.model.CartLine
+import com.brewkery.app.model.CartLineKey
+import com.brewkery.app.model.Order
+import com.brewkery.app.model.OrderStatus
+import com.brewkery.app.model.StoreMeta
+import com.brewkery.app.model.TicketIdGenerator
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

@@ -1,4 +1,4 @@
-package com.brewkery.app.domain.model
+package com.brewkery.app.model
 
 data class StoreMeta(
     val appName: String,

@@ -1,4 +1,4 @@
-package com.brewkery.app.util
+package com.brewkery.app.model
 
 import kotlin.random.Random
 

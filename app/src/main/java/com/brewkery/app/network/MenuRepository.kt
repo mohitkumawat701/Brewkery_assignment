@@ -1,10 +1,8 @@
-package com.brewkery.app.data.repository
+package com.brewkery.app.network
 
-import com.brewkery.app.data.mapper.toDomain
-import com.brewkery.app.data.remote.BrewkeryApi
-import com.brewkery.app.domain.model.Category
-import com.brewkery.app.domain.model.MenuItem
-import com.brewkery.app.domain.model.StoreMeta
+import com.brewkery.app.model.Category
+import com.brewkery.app.model.MenuItem
+import com.brewkery.app.model.StoreMeta
 import retrofit2.HttpException
 import java.io.IOException
 

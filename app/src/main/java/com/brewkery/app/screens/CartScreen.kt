@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.brewkery.app.ui.features.cart
+package com.brewkery.app.screens
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -53,22 +53,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.brewkery.app.R
-import com.brewkery.app.domain.model.CartLine
-import com.brewkery.app.domain.model.CartLineKey
-import com.brewkery.app.domain.model.ItemCustomizations
-import com.brewkery.app.domain.model.MenuItem
-import com.brewkery.app.domain.model.MilkOption
-import com.brewkery.app.domain.model.SizeOption
-import com.brewkery.app.domain.model.StoreMeta
-import com.brewkery.app.domain.pricing.PriceCalculator
-import com.brewkery.app.ui.features.menu.MenuUiState
-import com.brewkery.app.ui.features.menu.MenuViewModel
-import com.brewkery.app.ui.theme.Border
-import com.brewkery.app.ui.theme.BrewkeryTheme
-import com.brewkery.app.ui.theme.DarkText
-import com.brewkery.app.ui.theme.Espresso
-import com.brewkery.app.ui.theme.MutedBrown
-import com.brewkery.app.ui.theme.Terracotta
+import com.brewkery.app.model.CartLine
+import com.brewkery.app.model.CartLineKey
+import com.brewkery.app.model.ItemCustomizations
+import com.brewkery.app.model.MenuItem
+import com.brewkery.app.model.MilkOption
+import com.brewkery.app.model.PriceCalculator
+import com.brewkery.app.model.SizeOption
+import com.brewkery.app.model.StoreMeta
+import com.brewkery.app.theme.Border
+import com.brewkery.app.theme.BrewkeryTheme
+import com.brewkery.app.theme.DarkText
+import com.brewkery.app.theme.Espresso
+import com.brewkery.app.theme.MutedBrown
+import com.brewkery.app.theme.Terracotta
 
 private const val DEFAULT_DELIVERY_FEE_CENTS = 250L
 private const val DEFAULT_TAX_RATE_PERCENT = 8.0
@@ -126,8 +124,12 @@ fun CartScreenContent(
         },
         bottomBar = {
             if (cartLines.isNotEmpty() && meta != null) {
-                PlaceOrderBar(
+                BottomCheckoutSection(
+                    subtotalCents = subtotalCents,
+                    deliveryFeeCents = deliveryFeeCents,
+                    taxCents = taxCents,
                     totalCents = totalCents,
+                    taxRatePercent = taxRatePercent,
                     currencySymbol = meta.currencySymbol,
                     onPlaceOrder = onPlaceOrder,
                 )
@@ -142,11 +144,6 @@ fun CartScreenContent(
         } else {
             CartItemList(
                 cartLines = cartLines,
-                subtotalCents = subtotalCents,
-                deliveryFeeCents = deliveryFeeCents,
-                taxCents = taxCents,
-                totalCents = totalCents,
-                taxRatePercent = taxRatePercent,
                 currencySymbol = meta?.currencySymbol ?: "$",
                 innerPadding = innerPadding,
                 onUpdateQuantity = onUpdateQuantity,
@@ -204,11 +201,6 @@ private fun CartTopAppBar(
 @Composable
 private fun CartItemList(
     cartLines: List<CartLine>,
-    subtotalCents: Long,
-    deliveryFeeCents: Long,
-    taxCents: Long,
-    totalCents: Long,
-    taxRatePercent: Double,
     currencySymbol: String,
     innerPadding: PaddingValues,
     onUpdateQuantity: (CartLineKey, Int) -> Unit,
@@ -216,8 +208,8 @@ private fun CartItemList(
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(
-            top = innerPadding.calculateTopPadding(),
-            bottom = innerPadding.calculateBottomPadding() + 16.dp,
+            top = innerPadding.calculateTopPadding() + 8.dp,
+            bottom = innerPadding.calculateBottomPadding() + 8.dp,
         ),
     ) {
         items(
@@ -232,18 +224,6 @@ private fun CartItemList(
                 onIncrease = { onUpdateQuantity(line.key, line.quantity + 1) },
                 onDecrease = { onUpdateQuantity(line.key, line.quantity - 1) },
             )
-        }
-        item(key = "summary") {
-            Spacer(Modifier.height(4.dp))
-            OrderSummaryCard(
-                subtotalCents = subtotalCents,
-                deliveryFeeCents = deliveryFeeCents,
-                taxCents = taxCents,
-                totalCents = totalCents,
-                taxRatePercent = taxRatePercent,
-                currencySymbol = currencySymbol,
-            )
-            Spacer(Modifier.height(8.dp))
         }
     }
 }
@@ -346,6 +326,77 @@ private fun CartLineCard(
 }
 
 @Composable
+private fun BottomCheckoutSection(
+    subtotalCents: Long,
+    deliveryFeeCents: Long,
+    taxCents: Long,
+    totalCents: Long,
+    taxRatePercent: Double,
+    currencySymbol: String,
+    onPlaceOrder: () -> Unit,
+) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        color = Color(0xFFFDFAF7),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .navigationBarsPadding()
+                .padding(bottom = 12.dp),
+        ) {
+            OrderSummaryCard(
+                subtotalCents = subtotalCents,
+                deliveryFeeCents = deliveryFeeCents,
+                taxCents = taxCents,
+                totalCents = totalCents,
+                taxRatePercent = taxRatePercent,
+                currencySymbol = currencySymbol,
+            )
+            Spacer(Modifier.height(8.dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+            ) {
+                Button(
+                    onClick = onPlaceOrder,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                    contentPadding = PaddingValues(0.dp),
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                brush = Brush.linearGradient(
+                                    colors = listOf(
+                                        Color(0xFFD9532F),
+                                        Color(0xFFB84121),
+                                        Color(0xFF8C2B12),
+                                    ),
+                                ),
+                                shape = RoundedCornerShape(12.dp),
+                            ),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            text = "🔒 ${stringResource(R.string.label_place_order)} • ${PriceCalculator.formatPriceAsDollars(totalCents, currencySymbol)}",
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color.White,
+                            fontSize = 12.sp,
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
 private fun OrderSummaryCard(
     subtotalCents: Long,
     deliveryFeeCents: Long,
@@ -359,18 +410,18 @@ private fun OrderSummaryCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 16.dp, vertical = 4.dp),
         shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         border = BorderStroke(1.dp, Border),
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)) {
             SummaryRow("Subtotal", PriceCalculator.formatPriceAsDollars(subtotalCents, currencySymbol))
             SummaryRow("Delivery Fee", PriceCalculator.formatPriceAsDollars(deliveryFeeCents, currencySymbol))
             SummaryRow("Est. Tax ($taxRateDisplay%)", PriceCalculator.formatPriceAsDollars(taxCents, currencySymbol))
             HorizontalDivider(
-                modifier = Modifier.padding(vertical = 10.dp),
+                modifier = Modifier.padding(vertical = 6.dp),
                 color = Border,
                 thickness = 1.dp,
             )
@@ -388,77 +439,26 @@ private fun SummaryRow(label: String, amount: String, isBold: Boolean = false) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 3.dp),
+            .padding(vertical = 2.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = label,
-            fontSize = if (isBold) 13.sp else 11.sp,
+            fontSize = if (isBold) 12.sp else 11.sp,
             fontWeight = if (isBold) FontWeight.ExtraBold else FontWeight.Normal,
-            color = if (isBold) Espresso else MutedBrown,
+            color = if (isBold) DarkText else MutedBrown,
         )
         Text(
             text = amount,
-            fontSize = if (isBold) 14.sp else 11.sp,
+            fontSize = if (isBold) 13.sp else 11.sp,
             fontWeight = if (isBold) FontWeight.ExtraBold else FontWeight.SemiBold,
             color = if (isBold) Terracotta else DarkText,
         )
     }
 }
 
-@Composable
-private fun PlaceOrderBar(
-    totalCents: Long,
-    currencySymbol: String,
-    onPlaceOrder: () -> Unit,
-) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shadowElevation = 8.dp,
-        color = Color.White,
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .navigationBarsPadding()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-        ) {
-            Button(
-                onClick = onPlaceOrder,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                contentPadding = PaddingValues(0.dp),
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(
-                            brush = Brush.linearGradient(
-                                colors = listOf(
-                                    Color(0xFFD9532F),
-                                    Color(0xFFB84121),
-                                    Color(0xFF8C2B12),
-                                ),
-                            ),
-                            shape = RoundedCornerShape(12.dp),
-                        ),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = "🔒 ${stringResource(R.string.label_place_order)} • ${PriceCalculator.formatPriceAsDollars(totalCents, currencySymbol)}",
-                        fontWeight = FontWeight.ExtraBold,
-                        color = Color.White,
-                        fontSize = 12.sp,
-                    )
-                }
-            }
-        }
-    }
-}
+
 
 @Composable
 private fun EmptyCartState(modifier: Modifier = Modifier, onBack: () -> Unit) {

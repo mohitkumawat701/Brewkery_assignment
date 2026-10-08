@@ -1,4 +1,4 @@
-package com.brewkery.app.data.remote.dto
+package com.brewkery.app.network
 
 import com.google.gson.annotations.SerializedName
 

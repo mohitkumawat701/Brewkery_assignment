@@ -8,10 +8,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
-import com.brewkery.app.ui.features.cart.CartViewModel
-import com.brewkery.app.ui.features.menu.MenuViewModel
-import com.brewkery.app.ui.navigation.BrewkeryNavGraph
-import com.brewkery.app.ui.theme.BrewkeryTheme
+import com.brewkery.app.screens.BrewkeryNavGraph
+import com.brewkery.app.screens.CartViewModel
+import com.brewkery.app.screens.MenuViewModel
+import com.brewkery.app.theme.BrewkeryTheme
 
 class MainActivity : ComponentActivity() {
 
