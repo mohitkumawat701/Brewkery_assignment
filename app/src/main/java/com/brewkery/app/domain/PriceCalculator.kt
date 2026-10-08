@@ -38,10 +38,10 @@ object PriceCalculator {
             .toLong()
 
     fun unitPriceCents(
-        basePriceCents:      Long,
-        sizeExtraCents:      Long,
-        milkExtraCents:      Long,
-        sugarExtraCents:     Long,
+        basePriceCents: Long,
+        sizeExtraCents: Long,
+        milkExtraCents: Long,
+        sugarExtraCents: Long,
     ): Long = basePriceCents + sizeExtraCents + milkExtraCents + sugarExtraCents
 
     fun lineTotalCents(unitPriceCents: Long, quantity: Int): Long =
@@ -61,9 +61,9 @@ object PriceCalculator {
             .toLong()
 
     fun totalCents(
-        subtotalCents:   Long,
+        subtotalCents: Long,
         deliveryFeeCents: Long,
-        taxCents:        Long,
+        taxCents: Long,
     ): Long = subtotalCents + deliveryFeeCents + taxCents
 
     /** Formats a cent value as a display string, e.g. 1265 + "$" → "$12.65". */
