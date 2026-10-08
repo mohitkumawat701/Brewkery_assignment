@@ -62,6 +62,15 @@ import com.brewkery.app.ui.theme.Espresso
 import com.brewkery.app.ui.theme.MutedBrown
 import com.brewkery.app.ui.theme.Terracotta
 
+import androidx.compose.ui.tooling.preview.Preview
+import com.brewkery.app.domain.CartLineKey
+import com.brewkery.app.domain.ItemCustomizations
+import com.brewkery.app.domain.MenuItem
+import com.brewkery.app.domain.MilkOption
+import com.brewkery.app.domain.SizeOption
+import com.brewkery.app.domain.StoreMeta
+import com.brewkery.app.ui.theme.BrewkeryTheme
+
 // ─────────────────────────────────────────────────────────────────────────────
 
 @Composable
@@ -71,11 +80,37 @@ fun CartScreen(
     onBack:        () -> Unit,
     onOrderPlaced: () -> Unit,
 ) {
-    val cartLines    by cartViewModel.cartLines.collectAsState()
+    val cartLines     by cartViewModel.cartLines.collectAsState()
     val subtotalCents by cartViewModel.subtotalCents.collectAsState()
-    val menuState    by menuViewModel.uiState.collectAsState()
-    val meta         = (menuState as? MenuUiState.Success)?.meta
+    val menuState     by menuViewModel.uiState.collectAsState()
+    val meta          = (menuState as? MenuUiState.Success)?.meta
 
+    CartScreenContent(
+        cartLines        = cartLines,
+        subtotalCents    = subtotalCents,
+        meta             = meta,
+        onBack           = onBack,
+        onClearCart      = cartViewModel::clearCart,
+        onUpdateQuantity = { key, qty -> cartViewModel.updateQuantity(key, qty) },
+        onPlaceOrder     = {
+            if (meta != null) {
+                cartViewModel.placeOrder(meta)
+                onOrderPlaced()
+            }
+        },
+    )
+}
+
+@Composable
+fun CartScreenContent(
+    cartLines:        List<CartLine>,
+    subtotalCents:    Long,
+    meta:             StoreMeta?,
+    onBack:           () -> Unit,
+    onClearCart:      () -> Unit,
+    onUpdateQuantity: (CartLineKey, Int) -> Unit,
+    onPlaceOrder:     () -> Unit,
+) {
     val deliveryFeeCents = meta?.deliveryFeeCents ?: 250L
     val taxCents         = meta?.let { PriceCalculator.taxCents(subtotalCents, it.taxRatePercent) } ?: 0L
     val totalCents       = subtotalCents + deliveryFeeCents + taxCents
@@ -113,7 +148,7 @@ fun CartScreen(
                         textAlign     = TextAlign.Center,
                         letterSpacing = 1.sp,
                     )
-                    TextButton(onClick = { cartViewModel.clearCart() }) {
+                    TextButton(onClick = onClearCart) {
                         Text(
                             text       = "Clear Cart",
                             color      = Terracotta,
@@ -130,10 +165,7 @@ fun CartScreen(
                 PlaceOrderBar(
                     totalCents     = totalCents,
                     currencySymbol = meta.currencySymbol,
-                    onPlaceOrder   = {
-                        cartViewModel.placeOrder(meta)
-                        onOrderPlaced()
-                    },
+                    onPlaceOrder   = onPlaceOrder,
                 )
             }
         },
@@ -160,8 +192,8 @@ fun CartScreen(
                     CartLineCard(
                         line           = line,
                         currencySymbol = meta?.currencySymbol ?: "$",
-                        onIncrease     = { cartViewModel.updateQuantity(line.key, line.quantity + 1) },
-                        onDecrease     = { cartViewModel.updateQuantity(line.key, line.quantity - 1) },
+                        onIncrease     = { onUpdateQuantity(line.key, line.quantity + 1) },
+                        onDecrease     = { onUpdateQuantity(line.key, line.quantity - 1) },
                     )
                 }
                 item(key = "summary") {
@@ -432,5 +464,89 @@ private fun EmptyCartState(modifier: Modifier = Modifier, onBack: () -> Unit) {
                 )
             }
         }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Jetpack Compose Previews
+// ─────────────────────────────────────────────────────────────────────────────
+
+private val previewCartMeta = StoreMeta(
+    appName = "Brewkery Artisans",
+    tagline = "Fresh Roast & Bakes",
+    currencySymbol = "$",
+    deliveryFeeCents = 250L,
+    taxRatePercent = 8.0,
+    estimatedDeliveryTime = "25 mins",
+)
+
+private val previewCartLine = CartLine(
+    key = CartLineKey(1, "sz_med", "m_oat", "Standard (100%)"),
+    item = MenuItem(
+        id = 1,
+        categoryId = "c_hot",
+        name = "Toasted Caramel Macchiato",
+        tagline = "Rich espresso with toasted caramel syrup",
+        description = "Single-origin espresso layered with house-made salted caramel sauce.",
+        basePriceCents = 485L,
+        rating = 4.9,
+        reviewCount = 312,
+        prepTime = "4 mins",
+        calories = 240,
+        imageUrl = "https://images.unsplash.com/photo-1570968915860-54d5c301fa9f",
+        badge = "BESTSELLER",
+        ingredients = listOf("Espresso"),
+        customizations = ItemCustomizations(
+            sizes = emptyList(),
+            sugarLevels = emptyList(),
+            milkOptions = emptyList(),
+        ),
+    ),
+    chosenSize = SizeOption("sz_med", "Medium (12 oz)", 50L),
+    chosenMilk = MilkOption("m_oat", "Oat Milk", 60L),
+    chosenSugar = "Standard (100%)",
+    quantity = 2,
+    unitPriceCents = 595L,
+)
+
+@Preview(
+    name = "Cart Screen",
+    showBackground = true,
+    showSystemUi = true,
+    device = "spec:width=412dp,height=915dp,dpi=440"
+)
+@Composable
+private fun CartScreenPreview() {
+    BrewkeryTheme {
+        CartScreenContent(
+            cartLines = listOf(previewCartLine),
+            subtotalCents = 1190L,
+            meta = previewCartMeta,
+            onBack = {},
+            onClearCart = {},
+            onUpdateQuantity = { _, _ -> },
+            onPlaceOrder = {},
+        )
+    }
+}
+
+@Preview(
+    name = "Empty Cart Screen",
+    showBackground = true,
+    showSystemUi = true,
+    device = "spec:width=412dp,height=915dp,dpi=440"
+)
+@Composable
+private fun EmptyCartScreenPreview() {
+    BrewkeryTheme {
+        CartScreenContent(
+            cartLines = emptyList(),
+            subtotalCents = 0L,
+            meta = previewCartMeta,
+            onBack = {},
+            onClearCart = {},
+            onUpdateQuantity = { _, _ -> },
+            onPlaceOrder = {},
+        )
     }
 }

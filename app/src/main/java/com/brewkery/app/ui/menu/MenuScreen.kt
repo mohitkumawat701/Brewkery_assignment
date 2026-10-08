@@ -72,6 +72,12 @@ import com.brewkery.app.ui.theme.Espresso
 import com.brewkery.app.ui.theme.MutedBrown
 import com.brewkery.app.ui.theme.Terracotta
 
+import androidx.compose.ui.tooling.preview.Preview
+import com.brewkery.app.domain.ItemCustomizations
+import com.brewkery.app.domain.MilkOption
+import com.brewkery.app.domain.SizeOption
+import com.brewkery.app.ui.theme.BrewkeryTheme
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Screen entry point
 // ─────────────────────────────────────────────────────────────────────────────
@@ -90,6 +96,33 @@ fun MenuScreen(
     val subtotalCents by cartViewModel.subtotalCents.collectAsState()
     val activeOrder   by cartViewModel.activeOrder.collectAsState()
 
+    MenuScreenContent(
+        uiState            = uiState,
+        selectedCategoryId = selectedCatId,
+        cartCount          = cartCount,
+        subtotalCents      = subtotalCents,
+        activeOrder        = activeOrder,
+        onCategorySelected = menuViewModel::selectCategory,
+        onRetry            = menuViewModel::fetchMenu,
+        onItemClick        = onItemClick,
+        onCartClick        = onCartClick,
+        onOrderClick       = onOrderClick,
+    )
+}
+
+@Composable
+fun MenuScreenContent(
+    uiState:            MenuUiState,
+    selectedCategoryId: String?,
+    cartCount:          Int,
+    subtotalCents:      Long,
+    activeOrder:        Order?,
+    onCategorySelected: (String?) -> Unit,
+    onRetry:            () -> Unit,
+    onItemClick:        (Int) -> Unit,
+    onCartClick:        () -> Unit,
+    onOrderClick:       () -> Unit,
+) {
     // Local search query state — lives at this scope so it survives recompositions
     var searchQuery by remember { mutableStateOf("") }
 
@@ -120,15 +153,15 @@ fun MenuScreen(
 
                 is MenuUiState.Error -> ErrorState(
                     message = state.message,
-                    onRetry = menuViewModel::fetchMenu,
+                    onRetry = onRetry,
                 )
 
                 is MenuUiState.Success -> {
                     // Apply category filter first, then search query
-                    val categoryFiltered = if (selectedCatId == null) {
+                    val categoryFiltered = if (selectedCategoryId == null) {
                         state.items
                     } else {
-                        state.items.filter { it.categoryId == selectedCatId }
+                        state.items.filter { it.categoryId == selectedCategoryId }
                     }
                     val filteredItems = if (searchQuery.isBlank()) {
                         categoryFiltered
@@ -170,8 +203,8 @@ fun MenuScreen(
                         // ── Search bar ────────────────────────────────────────
                         item(key = "search") {
                             BrewkerySearchBar(
-                                query    = searchQuery,
-                                onQuery  = { searchQuery = it },
+                                query   = searchQuery,
+                                onQuery = { searchQuery = it },
                             )
                         }
 
@@ -179,8 +212,8 @@ fun MenuScreen(
                         stickyHeader(key = "chips") {
                             CategoryChipRow(
                                 categories         = state.categories,
-                                selectedCategoryId = selectedCatId,
-                                onCategorySelected = menuViewModel::selectCategory,
+                                selectedCategoryId = selectedCategoryId,
+                                onCategorySelected = onCategorySelected,
                             )
                         }
 
@@ -503,87 +536,91 @@ fun MenuItemCard(
     Card(
         modifier  = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 4.dp)
+            .padding(horizontal = 16.dp, vertical = 5.dp)
             .clickable(onClick = onItemClick),
-        shape     = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        shape     = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         colors    = CardDefaults.cardColors(containerColor = Color.White),
         border    = androidx.compose.foundation.BorderStroke(1.dp, Border),
     ) {
         Row(
             modifier          = Modifier
                 .fillMaxWidth()
-                .padding(10.dp),
+                .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            // Thumbnail — 56dp (prototype: w-14 h-14 = 56px)
-            AsyncImage(
+            // Thumbnail — 1:1 square display container (84dp) with ContentScale.Crop
+            com.brewkery.app.ui.components.AppImage(
                 model              = item.imageUrl,
                 contentDescription = stringResource(R.string.cd_item_image),
-                modifier           = Modifier
-                    .size(56.dp)
-                    .clip(RoundedCornerShape(8.dp)),
+                modifier           = Modifier.width(84.dp),
+                shape              = RoundedCornerShape(12.dp),
                 contentScale       = ContentScale.Crop,
             )
-            Spacer(Modifier.width(10.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                // Badge chip — amber-100 bg + amber-900 text (prototype: bg-amber-100 text-amber-900)
+            Spacer(Modifier.width(12.dp))
+            Column(
+                modifier            = Modifier.weight(1f),
+                verticalArrangement = Arrangement.Center,
+            ) {
+                // Badge chip — uppercase soft amber badge matching reference
                 if (item.badge.isNotBlank()) {
                     Surface(
                         shape = RoundedCornerShape(4.dp),
                         color = Color(0xFFFEF3C7), // amber-100
                     ) {
                         Text(
-                            text       = item.badge,
-                            modifier   = Modifier.padding(horizontal = 6.dp, vertical = 1.dp),
-                            fontWeight = FontWeight.Bold,
-                            color      = Color(0xFF78350F), // amber-900
-                            fontSize   = 9.sp,
+                            text          = item.badge.uppercase(),
+                            modifier      = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                            fontWeight    = FontWeight.Bold,
+                            color         = Color(0xFF78350F), // amber-900
+                            fontSize      = 9.sp,
+                            letterSpacing = 0.5.sp,
                         )
                     }
-                    Spacer(Modifier.height(2.dp))
+                    Spacer(Modifier.height(3.dp))
                 }
-                // Item name — bold espresso
+                // Item name — bold DarkText, prominent font size
                 Text(
                     text       = item.name,
                     fontWeight = FontWeight.Bold,
                     color      = DarkText,
-                    fontSize   = 12.sp,
-                    maxLines   = 1,
+                    fontSize   = 15.sp,
+                    maxLines   = 2,
                     overflow   = TextOverflow.Ellipsis,
+                    lineHeight = 19.sp,
                 )
-                Spacer(Modifier.height(2.dp))
+                Spacer(Modifier.height(3.dp))
                 // Rating row
                 Text(
                     text     = "⭐ %.1f (%d)".format(item.rating, item.reviewCount),
-                    fontSize = 10.sp,
+                    fontSize = 11.sp,
                     color    = MutedBrown,
                 )
-                Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(6.dp))
                 Row(
                     verticalAlignment     = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier              = Modifier.fillMaxWidth(),
                 ) {
-                    // Price — terracotta, monospace
+                    // Price — bold terracotta
                     Text(
                         text       = PriceCalculator.formatPrice(item.basePriceCents, currencySymbol),
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.ExtraBold,
                         color      = Terracotta,
-                        fontSize   = 12.sp,
+                        fontSize   = 15.sp,
                     )
-                    // "+ Customize" button — solid terracotta
+                    // "+ Customize" button — solid terracotta pill
                     Surface(
-                        shape   = RoundedCornerShape(6.dp),
+                        shape   = RoundedCornerShape(8.dp),
                         color   = Terracotta,
                         onClick = onItemClick,
                     ) {
                         Text(
                             text       = "+ Customize",
-                            modifier   = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                            modifier   = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
                             fontWeight = FontWeight.Bold,
                             color      = Color.White,
-                            fontSize   = 10.sp,
+                            fontSize   = 11.sp,
                         )
                     }
                 }
@@ -815,5 +852,122 @@ fun EmptyItemsState() {
                 color     = MutedBrown,
             )
         }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Jetpack Compose Previews
+// ─────────────────────────────────────────────────────────────────────────────
+
+private val previewStoreMeta = StoreMeta(
+    appName = "Brewkery Artisans",
+    tagline = "Fresh Roast & Bakes",
+    currencySymbol = "$",
+    deliveryFeeCents = 250L,
+    taxRatePercent = 8.0,
+    estimatedDeliveryTime = "25 mins",
+)
+
+private val previewCategories = listOf(
+    Category(id = "c_hot", name = "Hot Coffee", icon = "☕"),
+    Category(id = "c_cold", name = "Cold Brews", icon = "🥤"),
+    Category(id = "c_pastry", name = "Artisan Pastries", icon = "🥐"),
+)
+
+private val previewMenuItems = listOf(
+    MenuItem(
+        id = 1,
+        categoryId = "c_hot",
+        name = "Toasted Caramel Macchiato",
+        tagline = "Rich espresso with toasted caramel syrup and velvety steamed milk.",
+        description = "Single-origin espresso layered with house-made salted caramel sauce.",
+        basePriceCents = 485L,
+        rating = 4.9,
+        reviewCount = 312,
+        prepTime = "4 mins",
+        calories = 240,
+        imageUrl = "https://images.unsplash.com/photo-1570968915860-54d5c301fa9f",
+        badge = "BESTSELLER",
+        ingredients = listOf("Espresso", "Oat Milk", "Caramel Sauce"),
+        customizations = ItemCustomizations(
+            sizes = listOf(SizeOption("sz_med", "Medium (12 oz)", 0L)),
+            sugarLevels = listOf("Standard (100%)"),
+            milkOptions = listOf(MilkOption("m_oat", "Oat Milk", 60L)),
+        ),
+    ),
+    MenuItem(
+        id = 2,
+        categoryId = "c_cold",
+        name = "Velvet Vanilla Cold Foam",
+        tagline = "Slow-steeped cold brew crowned with sweet vanilla cream foam.",
+        description = "Signature 18-hour cold brew over ice, topped with sweet vanilla cold foam.",
+        basePriceCents = 540L,
+        rating = 4.8,
+        reviewCount = 248,
+        prepTime = "3 mins",
+        calories = 190,
+        imageUrl = "https://images.unsplash.com/photo-1517701604599-bb29b565090c",
+        badge = "STAFF PICK",
+        ingredients = listOf("Cold Brew", "Vanilla Cream"),
+        customizations = ItemCustomizations(
+            sizes = listOf(SizeOption("sz_med", "Medium (12 oz)", 0L)),
+            sugarLevels = listOf("Standard"),
+            milkOptions = listOf(MilkOption("m_cream", "Vanilla Cream", 0L)),
+        ),
+    ),
+)
+
+@Preview(
+    name = "Menu Screen",
+    showBackground = true,
+    showSystemUi = true,
+    device = "spec:width=412dp,height=915dp,dpi=440"
+)
+@Composable
+private fun MenuScreenPreview() {
+    BrewkeryTheme {
+        MenuScreenContent(
+            uiState = MenuUiState.Success(
+                meta = previewStoreMeta,
+                categories = previewCategories,
+                items = previewMenuItems,
+            ),
+            selectedCategoryId = null,
+            cartCount = 2,
+            subtotalCents = 1025L,
+            activeOrder = null,
+            onCategorySelected = {},
+            onRetry = {},
+            onItemClick = {},
+            onCartClick = {},
+            onOrderClick = {},
+        )
+    }
+}
+
+@Preview(name = "Product Card", showBackground = true)
+@Composable
+private fun MenuItemCardPreview() {
+    BrewkeryTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            MenuItemCard(
+                item = previewMenuItems.first(),
+                currencySymbol = "$",
+                onItemClick = {},
+            )
+        }
+    }
+}
+
+@Preview(name = "Cart Sticky Bar", showBackground = true)
+@Composable
+private fun CartStickyBarPreview() {
+    BrewkeryTheme {
+        CartStickyBar(
+            cartCount = 2,
+            subtotalCents = 1025L,
+            currencySymbol = "$",
+            onViewCart = {},
+        )
     }
 }

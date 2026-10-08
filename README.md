@@ -1,184 +1,198 @@
-# Brewkery — Android Take-Home Assessment
+<div align="center">
 
-Built by **Mahalaxmi** for the **Clickretina Android Developer** take-home assessment.
+# ☕ Brewkery
 
-This is a native Android coffee & bakery ordering app written in Kotlin using Jetpack Compose, Retrofit, and Coroutines. It follows the exact 4-screen flow and UI design from the [Live Prototype](https://vivekshah138.github.io/Brewkery/).
+### Coffee & Bakery Ordering App for Android
+
+![Kotlin](https://img.shields.io/badge/Kotlin-2.0.21-7F52FF?logo=kotlin&logoColor=white)
+![Compose](https://img.shields.io/badge/Jetpack%20Compose-Material%203-4285F4?logo=jetpackcompose&logoColor=white)
+![Retrofit](https://img.shields.io/badge/Retrofit-2-48B983)
+![Tests](https://img.shields.io/badge/Unit%20Tests-11%20passing-success)
+![Architecture](https://img.shields.io/badge/Architecture-MVVM-D9532F)
+
+Built by **Mohit Kumawat** for the **Clickretina Android Developer** take-home assessment.
+
+[Live Prototype](https://vivekshah138.github.io/Brewkery/) · [Build & Run](#-build--run) · [How I Used AI](#-how-i-used-ai)
+
+</div>
+
+---
+
+## 📑 Table of Contents
+
+- [App Walkthrough](#-app-walkthrough)
+- [How I Used AI](#-how-i-used-ai)
+- [Tech Stack](#-tech-stack)
+- [Engineering Decisions](#-engineering-decisions)
+- [Unit Tests](#-unit-tests)
+- [Build & Run](#-build--run)
+- [Submission Details](#-submission-details)
 
 ---
 
 ## 📱 App Walkthrough
 
-1. **Screen 1 — Home / Menu Catalog**:
-   - Header with `BK` branding, store status, and live cart item count.
-   - Store info delivery banner ($2.50 fee, 20-30 mins). Once an order is placed, this dynamically changes into an **Active Order Tracking Card** with a green pulsing dot and a "Track" button.
-   - Real-time search bar that filters items across names, taglines, and categories.
-   - Filter pills for categories (`All Items`, `☕ Hot Coffee`, `🧊 Cold Brews`, `🥐 Artisan Bakery`).
-   - Catalog cards with 56dp thumbnails, `BESTSELLER` / `SEASONAL` badges, star ratings, review counts, base price, and a `+ Customize` button.
-   - Sticky bottom bar (`View Your Cart • $X.XX`) that shows up whenever items are in the cart.
-
-2. **Screen 2 — Item Detail / Customizer**:
-   - 160dp hero image with badge overlay and interactive favorite heart toggle.
-   - Item title, base price in terracotta, description, and Key Ingredients tags.
-   - **Size Selection**: 3-column grid of cards with selected cream tint and border (`Tall`, `Grande`, `Venti`).
-   - **Milk Options**: Full-width selectable rows with price deltas (`+$0.50`, etc.).
-   - **Sugar Levels**: Rounded chips with dark Espresso fill when selected.
-   - Bottom bar with `[ − qty + ]` stepper and live-updating `Add to Cart • $X.XX` button.
-
-3. **Screen 3 — Cart & Checkout**:
-   - Header with `YOUR CART` and a `Clear Cart` option.
-   - Itemized list with item name, customized options (`Size • Milk • Sugar`), line price, and `[ − qty + ]` stepper.
-   - Bill breakdown card: Subtotal, $2.50 flat delivery fee, 8.0% tax, and Total Payable.
-   - Full-width `🔒 Place Order Now • $X.XX` gradient CTA.
-
-4. **Screen 4 — Order Status**:
-   - Coffee mug badge with terracotta border ring.
-   - Generated ticket ID (e.g. `#BK-84920`) and amber `PREPARING` badge.
-   - Estimated wait time, items ordered count, and barista status.
-   - `Back to Menu` button that clears the screen and returns to the catalog.
+| # | Screen | What it does |
+|---|--------|--------------|
+| 1 | **Home / Menu** | `BK` header with live cart count, delivery banner ($2.50, 20–30 mins) that becomes an **Active Order Tracking Card** after ordering, real-time search, category pills (`All Items`, `☕ Hot Coffee`, `🧊 Cold Brews`, `🥐 Artisan Bakery`), catalog cards with thumbnail, `BESTSELLER` / `SEASONAL` badge, rating, base price and `+ Customize`, plus a sticky `View Your Cart • $X.XX` bar. |
+| 2 | **Item Detail** | 160dp hero image with favorite heart, description and Key Ingredients, **Size** grid (`Tall` / `Grande` / `Venti`), **Milk** rows with price deltas, **Sugar** chips, and a `[ − qty + ]` stepper with live `Add to Cart • $X.XX`. |
+| 3 | **Cart & Checkout** | Itemized list with options (`Size • Milk • Sugar`), steppers, `Clear Cart`, bill card (Subtotal, $2.50 delivery, 8% tax, Total) and a gradient `🔒 Place Order Now` button. |
+| 4 | **Order Status** | Mug badge, generated ticket ID (e.g. `#BK-84920`), amber `PREPARING` badge, estimated wait, item count, and `Back to Menu`. |
 
 ---
 
-## 🤖 How I Used AI (Prompts, Wins & Fixes)
+## 🤖 How I Used AI
 
-At Clickretina you emphasize being AI-first. Throughout this project, I used AI tools (Gemini, Claude, Cursor) as my pair-programmer for planning, coding, and debugging. Here is an honest breakdown of how I used them.
+### Tools
 
-### Tools I Used
-- **Google Antigravity & Claude**: Used for initial architecture planning, drafting the Jetpack Compose screens, and debugging Compose window inset issues.
-- **Cursor / GitHub Copilot**: Used inside the IDE for fast autocompletion, writing DTOs, and scaffolding unit tests.
+| Tool | Used for |
+|------|----------|
+| **Google Antigravity & Claude** | Architecture planning, drafting Compose screens, debugging window insets |
+| **Cursor / GitHub Copilot** | Autocomplete, DTOs, scaffolding unit tests |
 
-### High-Signal Prompts I Used (How I Directed the AI)
+### Prompts I Sent
 
-Instead of asking generic questions like *"make an app"*, I treated AI as a senior engineering partner by giving explicit constraints, design tokens, non-functional requirements, and architectural boundaries. Here are the 4 key prompts I used:
+I gave AI explicit constraints, design tokens and architectural boundaries instead of generic requests.
 
-#### 1. Architecture, State Scoping & Money Representation
-> **Why this prompt**: Sets up a solid foundational architecture upfront, prevents floating-point currency errors at the network boundary, and avoids state loss during navigation without over-engineering with heavy frameworks.
-> 
-> *"Let's architect a native Android coffee ordering app in Kotlin following Clean MVVM. Here are my requirements: (1) Single-Activity with Navigation Compose; (2) Manual DI via an AppContainer singleton — no heavy Hilt/Dagger setup needed for this scope; (3) Retrofit 2 + Gson fetching from raw JSON endpoints; (4) Scope CartViewModel to the Activity so the in-memory cart and active order never get destroyed when navigating between screens; (5) Convert incoming Double prices into Long cents at DtoMappers.kt so zero floating-point arithmetic touches the domain or UI. Scaffold the core layers, Repositories, and ViewModels."*
+<details>
+<summary><b>1. Architecture, state scoping & money representation</b></summary>
 
-#### 2. Reverse-Engineering the Prototype UI in Jetpack Compose
-> **Why this prompt**: Provides the exact visual specs, Tailwind styles, and component constraints extracted directly from the live prototype so the generated Compose code matches pixel-for-pixel.
-> 
-> *"I'm inspecting the Brewkery web prototype (https://vivekshah138.github.io/Brewkery/). I need to match the design 1:1 in Jetpack Compose Material 3: (1) Define our color tokens: Terracotta (#D9532F), Espresso (#140B07), Crema (#FDFAF7), Amber (#F59E0B), Border (#EBD8CB), MutedBrown (#786457); (2) Catalog cards must have 56dp rounded thumbnails, amber-100 badges, star ratings, and a terracotta '+ Customize' button; (3) Item Detail needs a 3-column equal-width size selection grid with cream selected tint, full-width milk rows, and dark Espresso rounded chips for sugar levels; (4) The bottom CTA must be a gradient-terracotta button side-by-side with a bordered quantity stepper. Write modular composables for these screens."*
+> **Why:** Sets up the foundation upfront, avoids floating-point currency errors at the network boundary, and keeps state alive across navigation without heavy frameworks.
+>
+> *"Let's architect a native Android coffee ordering app in Kotlin following Clean MVVM. Requirements: (1) Single-Activity with Navigation Compose; (2) Manual DI via an AppContainer singleton, no Hilt/Dagger; (3) Retrofit 2 + Gson fetching from raw JSON endpoints; (4) Scope CartViewModel to the Activity so the in-memory cart and active order survive navigation; (5) Convert incoming Double prices into Long cents at DtoMappers.kt so no floating-point arithmetic touches the domain or UI. Scaffold the core layers, Repositories, and ViewModels."*
 
-#### 3. API Edge Cases & Accounting-Grade Financial Math
-> **Why this prompt**: Identifies a hidden data quirk in the API response and enforces strict financial rounding rules verified against the reference test bill.
-> 
-> *"Check the data.json API response closely: 'sizes' and 'milk_options' have numeric extra_price fields, but 'sugar_levels' are unstructured plain strings with embedded price strings like 'Light Wildflower Honey (+0.40)'. Write a pure Kotlin PriceCalculator that: (1) Uses regex to pull the extra price from sugar strings, defaulting to 0 for standard options; (2) Keeps all calculations strictly in Long cents; (3) Computes 8% tax on the subtotal using BigDecimal HALF_UP rounding to match the prototype's reference bill ($9.40 subtotal + $2.50 delivery + $0.75 tax = $12.65 total); (4) Write JUnit 4 unit tests covering every calculation and edge case."*
+</details>
 
-#### 4. Real-Device Edge-to-Edge Window Inset Engineering
-> **Why this prompt**: Diagnoses a subtle visual defect discovered during physical phone testing and directs the AI toward the architectural root cause rather than a quick hack.
-> 
-> *"On physical device testing with enableEdgeToEdge(), the bottom 'Add to Cart' bar has a visual bug: the outer Surface has navigationBarsPadding(), which makes it stop above the system gesture bar, leaving the bottom 30dp transparent so the scrolled LazyColumn list peeks through underneath! How do we structure Scaffold and Compose insets so the Surface background paints solid full-bleed all the way to the physical screen edge, while keeping the interactive buttons and steppers safely padded above the gesture bar? Also ensure LazyColumn bottom padding accommodates the bar so the last item is fully scrollable."*
+<details>
+<summary><b>2. Reverse-engineering the prototype UI in Compose</b></summary>
 
-### What AI Got Right
-- **Clean MVVM Architecture**: It set up a very clean unidirectional data flow with Kotlin `StateFlow`. Having the ViewModels scoped to the Activity meant the cart state and active order stayed intact when switching between screens.
-- **Handling Money in Cents**: It followed the suggestion to map everything to `Long` cents in `DtoMappers.kt`. This completely prevented floating-point math issues like `$0.10 + $0.20 = 0.30000000000000004`.
-- **Unit Tests**: It quickly generated 11 unit test cases for `PriceCalculator`, which made validating calculations very fast.
+> **Why:** Gives exact visual specs from the live prototype so the generated Compose code matches closely.
+>
+> *"I'm inspecting the Brewkery web prototype. Match it 1:1 in Jetpack Compose Material 3: (1) Color tokens: Terracotta #D9532F, Espresso #140B07, Crema #FDFAF7, Amber #F59E0B, Border #EBD8CB, MutedBrown #786457; (2) Catalog cards with 56dp rounded thumbnails, amber-100 badges, star ratings and a terracotta '+ Customize' button; (3) Item Detail with a 3-column size grid, full-width milk rows and dark Espresso sugar chips; (4) Gradient-terracotta bottom CTA beside a bordered quantity stepper. Write modular composables."*
 
-### What AI Got Wrong & How I Fixed It
-1. **Schema Assumption on Sugar Levels**:
-   - *What happened*: AI initially wrote DTOs assuming `sugar_levels` would be objects with an `extra_price` property, just like `sizes` and `milk_options`.
-   - *How I caught & fixed it*: When checking the raw `data.json`, I saw that `sugar_levels` is just a list of strings: `["0% Unsweetened", "Light Wildflower Honey (+0.40)"]`. I wrote a regex extractor in `PriceCalculator.kt`:
-     ```kotlin
-     private val SUGAR_EXTRA_REGEX = Regex("""\(\+(\d+\.\d+)\)""")
-     fun parseSugarExtraCents(sugarLevel: String): Long {
-         val match = SUGAR_EXTRA_REGEX.find(sugarLevel) ?: return 0L
-         return dollarsToCents(match.groupValues[1].toDoubleOrNull() ?: 0.0)
-     }
-     ```
-     This safely pulls the extra cost directly from the string and defaults to 0 if there's no surcharge.
+</details>
 
-2. **Bottom Bar Layout Leak on Real Devices**:
-   - *What happened*: AI put `Modifier.navigationBarsPadding()` directly on the outer `Surface` of the bottom action bar. On real phones with gesture navigation, this caused the white `Surface` to stop above the gesture bar, leaving the bottom 30dp transparent. As a result, the scrollable list underneath (the dark sugar level chips) peeked out through the bottom of the screen under the Add to Cart button.
-   - *How I caught & fixed it*: When testing on my phone, I noticed the visual glitch immediately. I fixed it by keeping the `Surface` full-bleed (so it draws solid white all the way to the screen edge) and moving `navigationBarsPadding()` to the inner `Row`:
-     ```kotlin
-     Surface(
-         modifier = Modifier.fillMaxWidth(),
-         color    = Color.White,
-     ) {
-         Row(
-             modifier = Modifier
-                 .fillMaxWidth()
-                 .navigationBarsPadding() // pads inner buttons safely above gesture pill
-                 .padding(horizontal = 16.dp, vertical = 12.dp)
-         ) { ... }
-     }
-     ```
-     I also increased the bottom padding of the `LazyColumn` so the lowest card can be scrolled comfortably into view.
+<details>
+<summary><b>3. API edge cases & accounting-grade financial math</b></summary>
+
+> **Why:** Surfaces a hidden data quirk and enforces rounding rules verified against the reference bill.
+>
+> *"In data.json, 'sizes' and 'milk_options' have numeric extra_price, but 'sugar_levels' are plain strings like 'Light Wildflower Honey (+0.40)'. Write a pure Kotlin PriceCalculator that: (1) uses regex to extract the sugar surcharge, defaulting to 0; (2) keeps everything in Long cents; (3) computes 8% tax with BigDecimal HALF_UP to match the reference bill ($9.40 + $2.50 + $0.75 = $12.65); (4) includes JUnit 4 tests for every calculation and edge case."*
+
+</details>
+
+<details>
+<summary><b>4. Edge-to-edge window insets on a real device</b></summary>
+
+> **Why:** Diagnoses a defect found on a physical phone and points the AI at the root cause, not a hack.
+>
+> *"With enableEdgeToEdge(), the bottom 'Add to Cart' bar leaves 30dp transparent because the outer Surface has navigationBarsPadding(), so the LazyColumn shows through underneath. How should Scaffold and insets be structured so the Surface paints solid to the screen edge while buttons stay above the gesture bar, and the last list item stays scrollable?"*
+
+</details>
+
+### ✅ What AI Got Right
+
+- **Clean MVVM** with unidirectional `StateFlow`; Activity-scoped ViewModels kept cart and order state intact across screens.
+- **Money in cents:** mapping everything to `Long` cents in `DtoMappers.kt` prevents bugs like `0.1 + 0.2 = 0.30000000000000004`.
+- **Unit tests:** generated 11 `PriceCalculator` tests quickly, which sped up validation.
+
+### ❌ What AI Got Wrong, and How I Fixed It
+
+**1. Schema assumption on sugar levels**
+
+AI wrote DTOs assuming `sugar_levels` were objects with `extra_price`. Checking the raw `data.json` showed they are plain strings like `"Light Wildflower Honey (+0.40)"`. I fixed it with a regex extractor:
+
+```kotlin
+private val SUGAR_EXTRA_REGEX = Regex("""\(\+(\d+\.\d+)\)""")
+fun parseSugarExtraCents(sugarLevel: String): Long {
+    val match = SUGAR_EXTRA_REGEX.find(sugarLevel) ?: return 0L
+    return dollarsToCents(match.groupValues[1].toDoubleOrNull() ?: 0.0)
+}
+```
+
+**2. Bottom bar leak on real devices**
+
+AI put `navigationBarsPadding()` on the outer `Surface`, so on gesture-nav phones the white surface stopped above the gesture bar and the list peeked through. I kept the `Surface` full-bleed and moved the padding to the inner `Row`:
+
+```kotlin
+Surface(modifier = Modifier.fillMaxWidth(), color = Color.White) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .navigationBarsPadding() // keeps buttons above the gesture pill
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+    ) { ... }
+}
+```
+
+I also increased the `LazyColumn` bottom padding so the last card scrolls fully into view.
 
 ---
 
-## 🛠 Tech Stack & Architecture
+## 🛠 Tech Stack
 
-- **Language**: Kotlin 2.0.21
-- **UI**: Jetpack Compose + Material 3 (Single Activity with Navigation Compose)
-- **Networking**: Retrofit 2 + Gson + OkHttp
-- **Async & State**: Coroutines + `StateFlow`
-- **Images**: Coil (`AsyncImage`)
-- **Architecture**: MVVM + Repository pattern
-- **Dependency Injection**: Manual via `AppContainer` singleton (simple, readable, and doesn't add Hilt/KAPT build overhead)
-- **Local Database**: None needed (in-memory cart resets when app closes, matching the assignment spec)
+| Layer | Choice |
+|-------|--------|
+| Language | Kotlin 2.0.21 |
+| UI | Jetpack Compose + Material 3, Navigation Compose (single Activity) |
+| Networking | Retrofit 2 + Gson + OkHttp |
+| Async & state | Coroutines + `StateFlow` |
+| Images | Coil (`AsyncImage`) |
+| Architecture | MVVM + Repository |
+| DI | Manual `AppContainer` singleton (no Hilt/KAPT overhead) |
+| Storage | None, in-memory cart resets on app close (per assignment) |
 
 ---
 
-## 💡 Practical Engineering Decisions
+## 💡 Engineering Decisions
 
-1. **All Money in Long Cents**: All arithmetic happens in `Long` cents internally. Conversion from `Double` happens once at the DTO mapping boundary (`DtoMappers.kt`), and formatting to `$X.XX` happens only when displaying text.
-2. **Tax Rounding (`BigDecimal HALF_UP`)**: The prototype showed this exact reference bill: Subtotal `$9.40` $\rightarrow$ Tax `$0.75` $\rightarrow$ Total `$12.65`. Standard float math can round unpredictably, so I used `BigDecimal` with `HALF_UP` on the subtotal:
+1. **All money in `Long` cents.** `Double` is converted once at `DtoMappers.kt`; formatting to `$X.XX` happens only at display time.
+2. **Tax with `BigDecimal` `HALF_UP`.** Reference bill: `$9.40` subtotal → `$0.75` tax → `$12.65` total.
    ```kotlin
    BigDecimal(subtotalCents).multiply(BigDecimal(0.08)).setScale(0, RoundingMode.HALF_UP).toLong()
    ```
-3. **Cart Item Merging**: Cart items use a composite key `CartLineKey(itemId, sizeId, milkOptionId, sugarLevel)`. If a user adds the exact same item with the same options twice, it increases the quantity rather than creating duplicate lines.
+3. **Cart line merging.** Key `CartLineKey(itemId, sizeId, milkOptionId, sugarLevel)`; identical items increase quantity instead of duplicating.
 
 ---
 
 ## 🧪 Unit Tests
 
-Run the test suite with:
 ```bash
 ./gradlew test
 ```
 
-All 11 unit tests in `PriceAndCartTests.kt` pass:
-- Price conversions (`dollarsToCents`, `formatPrice`)
-- Regex extraction for sugar surcharge strings
-- Additions of base price + size + milk + sugar
-- 8% tax calculation with `HALF_UP` rounding
-- Full bill reference check: **$9.40 subtotal + $2.50 delivery + $0.75 tax = $12.65 total**
-- Cart key hashing and line item quantity merging
+All 11 tests in `PriceAndCartTests.kt` pass:
+
+- [x] Price conversion (`dollarsToCents`, `formatPrice`)
+- [x] Regex extraction of sugar surcharges
+- [x] Base + size + milk + sugar addition
+- [x] 8% tax with `HALF_UP` rounding
+- [x] Full bill: **$9.40 + $2.50 + $0.75 = $12.65**
+- [x] Cart key hashing and quantity merging
 
 ---
 
-## 🚀 How to Build & Run
+## 🚀 Build & Run
 
-### 1. Clone the Repository
 ```bash
-git clone https://github.com/MahalaxmiDhanai/CLICKRETINA.git
-cd CLICKRETINA
-```
-
-### 2. Run Tests
-```bash
-./gradlew test
+git clone <your-github-repo-url>
+cd <repo-folder>
 ```
 
-### 3. Build the Debug APK
-```bash
-./gradlew assembleDebug
-```
-The output APK is generated at:
-```
-app/build/outputs/apk/debug/app-debug.apk
-```
+| Step | Command |
+|------|---------|
+| Run tests | `./gradlew test` |
+| Build debug APK | `./gradlew assembleDebug` |
+| Install on device / emulator | `./gradlew installDebug` |
 
-### 4. Install Directly to Device / Emulator
-```bash
-./gradlew installDebug
-```
+APK output: `app/build/outputs/apk/debug/app-debug.apk`
 
 ---
 
 ## 👤 Submission Details
-- **Candidate**: Mahalaxmi
-- **GitHub Repository**: [https://github.com/MahalaxmiDhanai/CLICKRETINA](https://github.com/MahalaxmiDhanai/CLICKRETINA)
-- **Email**: `Hr@clickretina.co.in`
+
+| | |
+|---|---|
+| **Candidate** | Mohit Kumawat |
+| **GitHub** | `<your-github-repo-url>` |
+| **Submitted to** | Hr@clickretina.co.in |

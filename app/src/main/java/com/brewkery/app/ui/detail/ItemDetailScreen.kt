@@ -7,6 +7,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -20,7 +21,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -74,6 +77,9 @@ import com.brewkery.app.ui.theme.Espresso
 import com.brewkery.app.ui.theme.MutedBrown
 import com.brewkery.app.ui.theme.Terracotta
 
+import androidx.compose.ui.tooling.preview.Preview
+import com.brewkery.app.ui.theme.BrewkeryTheme
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Entry point — resolves item from menu state by itemId
 // ─────────────────────────────────────────────────────────────────────────────
@@ -103,10 +109,10 @@ fun ItemDetailScreen(
                 }
             } else {
                 ItemDetailContent(
-                    item          = item,
-                    meta          = meta,
-                    cartViewModel = cartViewModel,
-                    onBack        = onBack,
+                    item        = item,
+                    meta        = meta,
+                    onAddToCart = cartViewModel::addToCart,
+                    onBack      = onBack,
                 )
             }
         }
@@ -119,10 +125,10 @@ fun ItemDetailScreen(
 
 @Composable
 private fun ItemDetailContent(
-    item:          MenuItem,
-    meta:          StoreMeta,
-    cartViewModel: CartViewModel,
-    onBack:        () -> Unit,
+    item:        MenuItem,
+    meta:        StoreMeta,
+    onAddToCart: (CartLine) -> Unit,
+    onBack:      () -> Unit,
 ) {
     val context        = LocalContext.current
     val currencySymbol = meta.currencySymbol
@@ -212,7 +218,7 @@ private fun ItemDetailContent(
                                 milkOptionId = chosenMilk.id,
                                 sugarLevel   = chosenSugar,
                             )
-                            cartViewModel.addToCart(
+                            onAddToCart(
                                 CartLine(
                                     key            = key,
                                     item           = item,
@@ -266,105 +272,113 @@ private fun ItemDetailContent(
         },
     ) { innerPadding ->
         LazyColumn(
-            modifier       = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(
-                top    = innerPadding.calculateTopPadding(),
-                bottom = innerPadding.calculateBottomPadding() + 24.dp,
-            ),
+            modifier       = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+            contentPadding = PaddingValues(bottom = 24.dp),
         ) {
 
-            // ── 1. Header row — back arrow circle | "ITEM CUSTOMIZER" | ❤ ────
-            item(key = "header_nav") {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.White)
-                        .padding(horizontal = 16.dp, vertical = 10.dp),
-                    verticalAlignment     = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
+            // ── 1. Header bar — scrolls naturally with content ─────────────────────
+            item(key = "header") {
+                Surface(
+                    modifier        = Modifier.fillMaxWidth(),
+                    color           = Color.White,
+                    shadowElevation = 0.dp,
                 ) {
-                    // Back button — circular white bordered button
-                    Surface(
-                        shape           = CircleShape,
-                        color           = Color.White,
-                        border          = BorderStroke(1.dp, Border),
-                        shadowElevation = 2.dp,
-                        onClick         = onBack,
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 4.dp),
+                        verticalAlignment     = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
-                        Box(
-                            modifier         = Modifier.size(36.dp),
-                            contentAlignment = Alignment.Center,
+                        // Back button — circular white bordered button
+                        Surface(
+                            shape           = CircleShape,
+                            color           = Color.White,
+                            border          = BorderStroke(1.dp, Border),
+                            shadowElevation = 2.dp,
+                            onClick         = onBack,
                         ) {
-                            Icon(
-                                imageVector        = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = stringResource(R.string.cd_back_button),
-                                tint               = Espresso,
-                                modifier           = Modifier.size(18.dp),
-                            )
+                            Box(
+                                modifier         = Modifier.size(36.dp),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Icon(
+                                    imageVector        = Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = stringResource(R.string.cd_back_button),
+                                    tint               = Espresso,
+                                    modifier           = Modifier.size(18.dp),
+                                )
+                            }
                         }
-                    }
 
-                    // Center title — "ITEM CUSTOMIZER" all caps
-                    Text(
-                        text          = "ITEM CUSTOMIZER",
-                        style         = MaterialTheme.typography.labelLarge,
-                        fontWeight    = FontWeight.ExtraBold,
-                        color         = Espresso,
-                        letterSpacing = 0.8.sp,
-                    )
+                        // Center title — "ITEM CUSTOMIZER" all caps
+                        Text(
+                            text          = "ITEM CUSTOMIZER",
+                            style         = MaterialTheme.typography.labelLarge,
+                            fontWeight    = FontWeight.ExtraBold,
+                            color         = Espresso,
+                            letterSpacing = 0.8.sp,
+                        )
 
-                    // Heart icon — toggleable favorite
-                    Surface(
-                        shape           = CircleShape,
-                        color           = Color.White,
-                        border          = BorderStroke(1.dp, Border),
-                        shadowElevation = 2.dp,
-                        onClick         = {
-                            isFavorite = !isFavorite
-                            Toast.makeText(
-                                context,
-                                if (isFavorite) "Item saved to favorites" else "Removed from favorites",
-                                Toast.LENGTH_SHORT,
-                            ).show()
-                        },
-                    ) {
-                        Box(
-                            modifier         = Modifier.size(36.dp),
-                            contentAlignment = Alignment.Center,
+                        // Heart icon — toggleable favorite
+                        Surface(
+                            shape           = CircleShape,
+                            color           = Color.White,
+                            border          = BorderStroke(1.dp, Border),
+                            shadowElevation = 2.dp,
+                            onClick         = {
+                                isFavorite = !isFavorite
+                                Toast.makeText(
+                                    context,
+                                    if (isFavorite) "Item saved to favorites" else "Removed from favorites",
+                                    Toast.LENGTH_SHORT,
+                                ).show()
+                            },
                         ) {
-                            Text(
-                                text     = if (isFavorite) "❤️" else "🤍",
-                                fontSize = 14.sp,
-                            )
+                            Box(
+                                modifier         = Modifier.size(36.dp),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Text(
+                                    text     = if (isFavorite) "❤️" else "🤍",
+                                    fontSize = 14.sp,
+                                )
+                            }
                         }
                     }
                 }
             }
 
-            // ── 2. Hero image — h-160dp (prototype: h-40), full width, badge top-left
+            // ── 2. Product Image Card — 2.18:1 rounded card with side margins & badge overlay ──
             item(key = "hero") {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(160.dp),
+                        .padding(start = 16.dp, top = 4.dp, end = 16.dp, bottom = 6.dp)
+                        .aspectRatio(2.18f)
+                        .clip(RoundedCornerShape(16.dp)),
                 ) {
-                    AsyncImage(
+                    com.brewkery.app.ui.components.AppImage(
                         model              = item.imageUrl,
                         contentDescription = stringResource(R.string.cd_hero_image),
                         modifier           = Modifier.fillMaxSize(),
                         contentScale       = ContentScale.Crop,
+                        shape              = RoundedCornerShape(16.dp),
+                        aspectRatio        = null,
                     )
                     // Badge — top-left, espresso dark semi-transparent pill with amber text
                     if (item.badge.isNotBlank()) {
                         Surface(
                             modifier = Modifier
                                 .align(Alignment.TopStart)
-                                .padding(10.dp),
+                                .padding(12.dp),
                             shape = RoundedCornerShape(50),
                             color = Espresso.copy(alpha = 0.85f),
                         ) {
                             Text(
-                                text          = item.badge,
+                                text          = item.badge.uppercase(),
                                 modifier      = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                                 style         = MaterialTheme.typography.labelSmall,
                                 fontWeight    = FontWeight.ExtraBold,
@@ -611,5 +625,64 @@ private fun CustomizationCard(title: String, content: @Composable () -> Unit) {
             Spacer(Modifier.height(10.dp))
             content()
         }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Jetpack Compose Previews
+// ─────────────────────────────────────────────────────────────────────────────
+
+@Preview(
+    name = "Product Detail Screen",
+    showBackground = true,
+    showSystemUi = true,
+    device = "spec:width=412dp,height=915dp,dpi=440"
+)
+@Composable
+private fun ItemDetailScreenPreview() {
+    val sampleMeta = StoreMeta(
+        appName = "Brewkery Artisans",
+        tagline = "Fresh Roast & Bakes",
+        currencySymbol = "$",
+        deliveryFeeCents = 250L,
+        taxRatePercent = 8.0,
+        estimatedDeliveryTime = "25 mins",
+    )
+    val sampleItem = MenuItem(
+        id = 1,
+        categoryId = "c_hot",
+        name = "Toasted Caramel Macchiato",
+        tagline = "Rich espresso with toasted caramel syrup and velvety steamed milk.",
+        description = "Single-origin espresso layered with house-made salted caramel sauce, silky oat milk, and a delicate amber sugar drizzle.",
+        basePriceCents = 485L,
+        rating = 4.9,
+        reviewCount = 312,
+        prepTime = "4 mins",
+        calories = 240,
+        imageUrl = "https://images.unsplash.com/photo-1570968915860-54d5c301fa9f",
+        badge = "BESTSELLER",
+        ingredients = listOf("Espresso", "Oat Milk", "Caramel Sauce", "Amber Sugar"),
+        customizations = com.brewkery.app.domain.ItemCustomizations(
+            sizes = listOf(
+                com.brewkery.app.domain.SizeOption("sz_small", "Small (8 oz)", 0L),
+                com.brewkery.app.domain.SizeOption("sz_medium", "Medium (12 oz)", 50L),
+                com.brewkery.app.domain.SizeOption("sz_large", "Large (16 oz)", 100L),
+            ),
+            sugarLevels = listOf("Standard (100%)", "Less Sugar (50%)", "No Sugar (0%)"),
+            milkOptions = listOf(
+                com.brewkery.app.domain.MilkOption("m_whole", "Whole Milk", 0L),
+                com.brewkery.app.domain.MilkOption("m_oat", "Oat Milk (Barista Blend)", 60L),
+                com.brewkery.app.domain.MilkOption("m_almond", "Almond Milk", 50L),
+            ),
+        ),
+    )
+
+    BrewkeryTheme {
+        ItemDetailContent(
+            item = sampleItem,
+            meta = sampleMeta,
+            onAddToCart = {},
+            onBack = {},
+        )
     }
 }

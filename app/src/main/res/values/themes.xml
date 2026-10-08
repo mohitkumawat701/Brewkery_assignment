@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Material 3 theme – Compose reads this for the window background/status bar -->
-    <style name="Theme.Brewkery" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.Brewkery" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:windowBackground">#FDFAF7</item>
+    </style>
 </resources>

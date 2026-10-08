@@ -47,6 +47,10 @@ import com.brewkery.app.ui.theme.Espresso
 import com.brewkery.app.ui.theme.MutedBrown
 import com.brewkery.app.ui.theme.Terracotta
 
+import androidx.compose.ui.tooling.preview.Preview
+import com.brewkery.app.domain.OrderStatus
+import com.brewkery.app.ui.theme.BrewkeryTheme
+
 // ── Entry point ───────────────────────────────────────────────────────────────
 
 @Composable
@@ -68,7 +72,7 @@ fun OrderStatusScreen(
 // ── Order status content matching prototype exactly ───────────────────────────
 
 @Composable
-private fun OrderStatusContent(order: Order, onBackToMenu: () -> Unit) {
+fun OrderStatusContent(order: Order, onBackToMenu: () -> Unit) {
     Scaffold(
         containerColor = Color(0xFFFDFAF7),
     ) { innerPadding ->
@@ -268,5 +272,30 @@ private fun OrderStatusContent(order: Order, onBackToMenu: () -> Unit) {
                 )
             }
         }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Jetpack Compose Previews
+// ─────────────────────────────────────────────────────────────────────────────
+
+@Preview(
+    name = "Order Status Screen",
+    showBackground = true,
+    showSystemUi = true,
+    device = "spec:width=412dp,height=915dp,dpi=440"
+)
+@Composable
+private fun OrderStatusScreenPreview() {
+    BrewkeryTheme {
+        OrderStatusContent(
+            order = Order(
+                ticketId = "#BK-22718",
+                status = OrderStatus.PREPARING,
+                totalItemCount = 3,
+                estimatedWait = "25 mins",
+            ),
+            onBackToMenu = {},
+        )
     }
 }
