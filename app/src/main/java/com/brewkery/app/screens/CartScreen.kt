@@ -244,16 +244,16 @@ private fun CartLineCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 5.dp),
+            .padding(horizontal = 16.dp, vertical = 4.dp),
         shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         border = BorderStroke(1.dp, Border),
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 14.dp, vertical = 12.dp),
+                .padding(horizontal = 12.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(modifier = Modifier.weight(1f)) {
@@ -264,6 +264,7 @@ private fun CartLineCard(
                     color = DarkText,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
+                    fontSize = 13.5.sp,
                 )
                 if (summary.isNotBlank()) {
                     Spacer(Modifier.height(2.dp))
@@ -271,36 +272,37 @@ private fun CartLineCard(
                         text = summary,
                         style = MaterialTheme.typography.labelSmall,
                         color = MutedBrown,
-                        maxLines = 2,
+                        maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         fontSize = 10.sp,
                     )
                 }
-                Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(3.dp))
                 Text(
                     text = PriceCalculator.formatPriceAsDollars(lineTotalCents, currencySymbol),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.ExtraBold,
                     color = Terracotta,
+                    fontSize = 13.5.sp,
                 )
             }
 
-            Spacer(Modifier.width(12.dp))
+            Spacer(Modifier.width(10.dp))
 
             Surface(
-                shape = RoundedCornerShape(10.dp),
+                shape = RoundedCornerShape(8.dp),
                 color = Color(0xFFF7EBE1),
                 border = BorderStroke(1.dp, Border),
             ) {
                 Row(
-                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Text(
                         text = "−",
                         fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
+                        fontSize = 13.sp,
                         color = DarkText,
                         modifier = Modifier.clickable { onDecrease() },
                     )
@@ -310,12 +312,13 @@ private fun CartLineCard(
                         fontWeight = FontWeight.Bold,
                         color = DarkText,
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.widthIn(min = 20.dp),
+                        modifier = Modifier.widthIn(min = 18.dp),
+                        fontSize = 12.sp,
                     )
                     Text(
                         text = "+",
                         fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
+                        fontSize = 13.sp,
                         color = DarkText,
                         modifier = Modifier.clickable { onIncrease() },
                     )

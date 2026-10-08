@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -51,6 +52,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -296,12 +299,7 @@ fun BrewkeryAppBar(cartCount: Int, onCartClick: () -> Unit) {
         }
 
         Box(
-            modifier = Modifier
-                .size(36.dp)
-                .clip(CircleShape)
-                .background(Color.White)
-                .clickable(onClick = onCartClick),
-            contentAlignment = Alignment.Center,
+            modifier = Modifier.clickable(onClick = onCartClick),
         ) {
             Surface(
                 modifier = Modifier.size(36.dp),
@@ -319,16 +317,23 @@ fun BrewkeryAppBar(cartCount: Int, onCartClick: () -> Unit) {
                 Box(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .size(16.dp)
+                        .offset(x = 4.dp, y = (-4).dp)
+                        .size(17.dp)
                         .clip(CircleShape)
                         .background(Terracotta),
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        text = if (cartCount > 9) "9+" else cartCount.toString(),
+                        text = if (cartCount > 99) "99+" else cartCount.toString(),
                         color = Color.White,
-                        fontSize = 8.sp,
-                        fontWeight = FontWeight.Bold,
+                        fontSize = 9.5.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        textAlign = TextAlign.Center,
+                        style = TextStyle(
+                            platformStyle = PlatformTextStyle(
+                                includeFontPadding = false,
+                            ),
+                        ),
                     )
                 }
             }
@@ -515,9 +520,9 @@ fun MenuItemCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 5.dp)
+            .padding(horizontal = 16.dp, vertical = 4.dp)
             .clickable(onClick = onItemClick),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(14.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         border = BorderStroke(1.dp, Border),
@@ -531,14 +536,13 @@ fun MenuItemCard(
             AppImage(
                 model = item.imageUrl,
                 contentDescription = stringResource(R.string.cd_item_image),
-                modifier = Modifier.width(84.dp),
-                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.size(64.dp),
+                shape = RoundedCornerShape(10.dp),
                 contentScale = ContentScale.Crop,
             )
             Spacer(Modifier.width(12.dp))
             Column(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.Center,
             ) {
                 if (item.badge.isNotBlank()) {
                     Surface(
@@ -550,7 +554,7 @@ fun MenuItemCard(
                             modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF78350F),
-                            fontSize = 9.sp,
+                            fontSize = 8.5.sp,
                             letterSpacing = 0.5.sp,
                         )
                     }
@@ -560,22 +564,22 @@ fun MenuItemCard(
                     text = item.name,
                     fontWeight = FontWeight.Bold,
                     color = DarkText,
-                    fontSize = 15.sp,
-                    maxLines = 2,
+                    fontSize = 14.sp,
+                    maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    lineHeight = 19.sp,
+                    lineHeight = 18.sp,
                 )
-                Spacer(Modifier.height(3.dp))
+                Spacer(Modifier.height(2.dp))
                 Text(
                     text = "⭐ %.1f (%d)".format(item.rating, item.reviewCount),
                     fontSize = 11.sp,
                     color = MutedBrown,
                 )
-                Spacer(Modifier.height(6.dp))
+                Spacer(Modifier.height(8.dp))
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
                         text = PriceCalculator.formatPriceAsDollars(item.basePriceCents, currencySymbol),
